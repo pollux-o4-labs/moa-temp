@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function validPlanDocument() {
+      return request.resource.data.keys().hasOnly([
+          'plan',
+          'revision',
+          'updatedAt'
+        ])
+        && request.resource.data.plan is map
+        && request.resource.data.revision is int
+        && request.resource.data.revision > 0
+        && request.resource.data.updatedAt is timestamp;
+    }
+
+    match /users/{userId}/plans/{day} {
+      allow read: if owns(userId);
+      allow create: if owns(userId)
+        && validPlanDocument()
+        && request.resource.data.revision == 1;
+      allow update: if owns(userId)
+        && resource.data.keys().hasOnly(['plan', 'revision', 'updatedAt'])
+        && validPlanDocument()
+        && request.resource.data.revision == resource.data.revision + 1;
+      allow delete: if false;
+    }
+  }
+}

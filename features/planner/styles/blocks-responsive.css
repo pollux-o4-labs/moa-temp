@@ -1,0 +1,90 @@
+@media (max-width: 1100px) {
+  .edit-block {
+    gap: 10px;
+  }
+}
+@media (max-width: 800px) {
+  .time-label {
+    font-size: 12px;
+    width: 38px;
+  }
+  .clay-block {
+    gap: 9px;
+  }
+  .block-copy .block-title {
+    font-size: 15px;
+  }
+  .category {
+    font-size: 11px;
+  }
+  .duration {
+    font-size: 12px;
+    padding: 5px 8px;
+  }
+  .grip-button {
+    padding: 0;
+  }
+}
+@media (max-width: 450px) {
+  .block-icon {
+    display: none;
+  }
+  .clay-block {
+    padding-right: 12px;
+    padding-left: 8px;
+  }
+  .time-label {
+    width: 35px;
+    font-size: 11px;
+  }
+  .schedule-row {
+    gap: 7px;
+  }
+  .block-copy .block-title {
+    font-size: 14px;
+  }
+
+  .timeline-list .clay-block {
+    display: grid;
+    grid-template-columns: var(--planner-touch-target) minmax(0, 1fr) var(
+        --planner-touch-target
+      );
+    grid-template-areas:
+      "grip edit done"
+      ". duration duration";
+    gap: 4px 6px;
+  }
+  .timeline-list .clay-block > .grip-button {
+    grid-area: grip;
+  }
+  .timeline-list .clay-block > .edit-block {
+    grid-area: edit;
+    width: auto;
+  }
+  .timeline-list .clay-block > .duration {
+    grid-area: duration;
+    justify-self: end;
+  }
+  .timeline-list .clay-block > .done-check {
+    grid-area: done;
+  }
+}
+@media (forced-colors: active) {
+  .dot {
+    forced-color-adjust: none;
+    background: Canvas;
+    border: 2px solid CanvasText;
+  }
+  .dot.blue {
+    border-style: solid;
+  }
+  .dot.peach {
+    border-style: dashed;
+  }
+  .dot.green {
+    border-style: dotted;
+  }
+  .dot.yellow {
+    border-style: double;
+  }
+}

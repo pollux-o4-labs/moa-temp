@@ -1,0 +1,24 @@
+[tools]
+node = "22.13.0"
+yarn = "4.18.0"
+
+[tasks.install]
+description = "Install the locked public frontend dependencies"
+run = "yarn install --immutable"
+
+[tasks.check]
+description = "Run the public frontend quality gate"
+run = [
+  "yarn format:check",
+  "yarn lint",
+  "yarn build",
+  "yarn test",
+]
+
+[tasks.dev]
+description = "Start the public frontend development server"
+run = "yarn dev"
+
+[tasks.deploy]
+description = "Build and deploy the static SPA to Firebase Hosting"
+run = "yarn firebase:deploy"

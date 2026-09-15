@@ -1,0 +1,110 @@
+@import "../features/planner/styles/layout.css";
+@import "../features/planner/styles/layout-controls.css";
+@import "../features/planner/styles/layout-responsive.css";
+@import "../features/planner/styles/blocks-entry.css";
+@import "../features/planner/styles/blocks.css";
+@import "../features/planner/styles/blocks-responsive.css";
+@import "../features/planner/styles/overview.css";
+@import "../features/planner/styles/editor.css";
+@import "tailwindcss";
+@import "tw-animate-css";
+@custom-variant dark (&:is(.dark *));
+:root {
+  --planner-touch-target: 44px;
+  --planner-toast-safe-space: 76px;
+  --planner-text-muted: #5d6b59;
+  --planner-text-subtle: #657259;
+  --chart-blue: #adc6dd;
+  --chart-peach: #e7bca0;
+  --chart-green: #b5c6a1;
+  --chart-yellow: #dfcb8e;
+  --background: #faf9f6;
+  --foreground: #343b39;
+  --card: #fff;
+  --card-foreground: #343b39;
+  --popover: #fff;
+  --popover-foreground: #343b39;
+  --primary: #476256;
+  --primary-foreground: #fff;
+  --secondary: #edece6;
+  --secondary-foreground: #343b39;
+  --muted: #efeee8;
+  --muted-foreground: #787e77;
+  --accent: #e9eee8;
+  --accent-foreground: #343b39;
+  --destructive: #a84638;
+  --border: #e7e7df;
+  --input: #d9ddd4;
+  --ring: #738979;
+  --radius: 1rem;
+}
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #f8f8f4;
+  color: #343b39;
+  font-family: Arial, "Noto Sans KR", sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+body:has([data-slot="dialog-overlay"]) {
+  overflow: hidden;
+}
+[data-slot="dialog-scroll"] {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: grid;
+  gap: 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+[data-slot="dialog-close"] {
+  min-width: var(--planner-touch-target);
+  min-height: var(--planner-touch-target);
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #315b3d;
+  outline-offset: 4px;
+}
+button {
+  transition:
+    transform 0.18s,
+    background 0.18s;
+}
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}

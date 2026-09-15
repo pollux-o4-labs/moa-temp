@@ -1,0 +1,157 @@
+@media (max-width: 1100px) {
+  .date-row > div {
+    flex-wrap: wrap;
+  }
+  .date-picker {
+    flex-basis: 100%;
+    margin-left: 26px;
+  }
+}
+@media (max-width: 800px) {
+  .date-picker {
+    flex-basis: auto;
+    margin-left: 3px;
+  }
+  .work-area {
+    padding: 22px 15px;
+  }
+  .plan-meta {
+    font-size: 11px;
+  }
+  .plan-meta button {
+    font-size: 12px;
+  }
+  .date-row strong {
+    font-size: 16px;
+  }
+  .page-title p {
+    max-width: 260px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .today-label {
+    font-size: 12px;
+  }
+  .start-time input {
+    width: 116px;
+    font-size: 12px;
+  }
+  .date-picker label {
+    font-size: 12px;
+  }
+  .toolbar [data-slot="tabs-trigger"] {
+    font-size: 13px;
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+}
+@media (max-width: 450px) {
+  main {
+    margin: 0 12px;
+  }
+  .page-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .page-title > div {
+    min-width: 0;
+  }
+  .page-title p {
+    overflow-wrap: anywhere;
+  }
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .toolbar [data-slot="tabs-list"] {
+    width: 100%;
+    max-width: 100%;
+  }
+  .toolbar [data-slot="tabs-trigger"] {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .start-time {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .error-banner {
+    flex-wrap: wrap;
+  }
+  .error-banner > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .work-area {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .date-picker {
+    flex-basis: 100%;
+    margin-left: 25px;
+  }
+  .brand-sub,
+  .today-label {
+    display: none;
+  }
+  .page-title .primary {
+    padding: 12px;
+    font-size: 13px;
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+  .page-title {
+    gap: 12px;
+  }
+  .start-time input {
+    width: 116px;
+    padding: 6px 5px;
+  }
+  .toolbar [data-slot="tabs-trigger"] {
+    font-size: 12px;
+    padding: 7px 8px;
+  }
+  .page-title p {
+    font-size: 12px;
+  }
+  .drag-hint {
+    font-size: 11px;
+  }
+  .plan-meta > span {
+    max-width: 200px;
+    line-height: 1.6;
+  }
+  .date-row {
+    gap: 8px;
+  }
+  .work-area {
+    padding-bottom: calc(21px + var(--planner-toast-safe-space));
+  }
+  .timeline-list .time-label {
+    width: max-content;
+    min-width: 56px;
+    white-space: nowrap;
+    font-size: 10px;
+  }
+}
+@media (min-width: 451px) and (max-width: 800px) {
+  .page-title {
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .page-title > div {
+    min-width: 0;
+  }
+  .page-title h1 {
+    white-space: nowrap;
+  }
+}
+@media (min-width: 801px) and (max-width: 950px) {
+  .planner {
+    grid-template-columns: 1fr;
+  }
+  .overview {
+    position: static;
+  }
+}

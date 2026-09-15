@@ -1,0 +1,56 @@
+.quick-add {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #e1e7dc;
+  border-radius: 16px;
+  background: #fbfcf8;
+}
+.quick-add label {
+  color: #64745d;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.quick-add input {
+  min-width: 0;
+  min-height: var(--planner-touch-target);
+  border: 0;
+  background: transparent;
+  color: #3f5036;
+  font-size: 15px;
+  outline: none;
+}
+.quick-add input::placeholder {
+  color: #a0a99a;
+}
+.quick-add input:focus-visible {
+  outline: 3px solid #315b3d;
+  outline-offset: 2px;
+  border-radius: 5px;
+}
+.quick-add .primary {
+  min-height: var(--planner-touch-target);
+  padding: 9px 13px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.quick-add > span {
+  grid-column: 2 / -1;
+  color: #ad6652;
+  font-size: 12px;
+}
+@media (max-width: 800px) {
+  .quick-add {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .quick-add label {
+    display: none;
+  }
+  .quick-add > span {
+    grid-column: 1 / -1;
+  }
+}

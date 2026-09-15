@@ -1,0 +1,16 @@
+node_modules/
+.next/
+dist/
+.wrangler/
+.mise/
+coverage/
+playwright-report/
+test-results/
+vendor/
+package-lock.json
+AGENTS.md
+components/ui/
+examples/
+drizzle/meta/
+build/sites-vite-plugin.ts
+hooks/use-mobile.ts

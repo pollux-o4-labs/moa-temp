@@ -1,0 +1,170 @@
+.date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: #fff;
+}
+.date-row > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.plan-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: -9px 0 18px;
+  color: var(--planner-text-muted);
+  font-size: 12px;
+  gap: 10px;
+}
+.plan-meta button {
+  border: 0;
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--planner-text-muted);
+  min-height: var(--planner-touch-target);
+  padding: 0 6px;
+}
+.date-picker {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.date-picker > button {
+  width: var(--planner-touch-target);
+  min-width: var(--planner-touch-target);
+  flex: 0 0 var(--planner-touch-target);
+  min-height: var(--planner-touch-target);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--planner-text-muted);
+}
+.date-picker label {
+  position: relative;
+  cursor: pointer;
+  color: var(--planner-text-muted);
+  font-size: 13px;
+  min-height: var(--planner-touch-target);
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+}
+.date-picker input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.date-picker label:has(input:focus-visible) {
+  outline: 3px solid #315b3d;
+  outline-offset: 3px;
+  border-radius: 5px;
+}
+.date-picker input::-webkit-calendar-picker-indicator {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.date-row .save-button {
+  white-space: nowrap;
+}
+.save-button.unsaved {
+  background: #eff3e9;
+  color: #546a47;
+  border-color: #d8e0cf;
+}
+.error-banner {
+  padding: 13px 15px;
+  background: #fff2eb;
+  border: 1px solid #eacdbc;
+  border-radius: 12px;
+  color: #985c45;
+  font-size: 13px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 20px;
+}
+.error-banner button {
+  flex-shrink: 0;
+  border: 0;
+  background: none;
+  text-decoration: underline;
+}
+.conflict-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.conflict-details {
+  display: grid;
+  flex-basis: 100%;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+}
+.conflict-field {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid #eacdbc;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 55%);
+}
+.conflict-field > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.conflict-field button {
+  padding: 0;
+}
+.date-row strong {
+  font-size: 17px;
+  letter-spacing: -0.6px;
+}
+.save-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e1e4dc;
+  border-radius: 10px;
+  background: #fff;
+  padding: 9px 12px;
+  font-size: 12px;
+  color: #657461;
+  min-height: var(--planner-touch-target);
+}
+.start-time {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--planner-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.start-time input {
+  width: 116px;
+  min-height: var(--planner-touch-target);
+  max-width: none;
+  color: #56664e;
+  border: 1px solid #e1e5d9;
+  padding: 7px;
+  border-radius: 9px;
+  background: #fff;
+  font-size: 13px;
+}
