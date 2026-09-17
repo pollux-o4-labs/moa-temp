@@ -67,12 +67,15 @@ jobs:
           # configure-pages returns "/repository" or ""; Vite normalizes it.
           VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}
         run: mise run deploy
-      - name: Keep SPA fallback for direct URLs
+      - name: Keep SPA entries for direct URLs
         run: |
           set -euo pipefail
           test -s dist/index.html
           cp dist/index.html dist/404.html
+          mkdir -p dist/planner
+          cp dist/index.html dist/planner/index.html
           test -s dist/404.html
+          test -s dist/planner/index.html
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
