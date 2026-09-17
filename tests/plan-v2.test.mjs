@@ -5,8 +5,8 @@ import {
   decodePlan,
   persistedPlanSchema,
   STORAGE_SCHEMA_VERSION,
-  planSummary,
 } from "../lib/plan.ts";
+import { planSummary } from "../lib/plan-summary.ts";
 import { schedule } from "../lib/plan-schedule.ts";
 
 test("v1 plans decode into v2 without inventing user choices", () => {

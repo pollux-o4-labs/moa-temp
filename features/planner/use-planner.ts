@@ -2,7 +2,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { dateSchema, localDate } from "@/lib/plan-date";
-import type { BlockField } from "@/lib/plan-merge";
+import type { BlockField } from "@/lib/block-fields";
 import type { PlanCommand } from "@/lib/plan-commands";
 import { createPlannerSession, isDirty } from "./planner-session";
 import {
@@ -10,9 +10,10 @@ import {
   plannerLocationWarning,
   readPlannerLocation,
   withPlannerLocation,
+  DEFAULT_PLANNER_LOCATION,
   type PlannerLocation,
 } from "./planner-location";
-import { browserPlanRepository } from "./plan-repository";
+import { createBrowserPlanRepository } from "./browser-plan-repository-runtime";
 import { registerPlannerTools } from "./webmcp";
 import { createBrowserLocalDraftStore } from "./local-draft";
 
@@ -23,13 +24,6 @@ const messages: Record<PlanCommand["type"], string | null> = {
   complete: null,
   start: null,
 };
-const defaultLocation: PlannerLocation = {
-  day: null,
-  view: "blocks",
-  invalidDay: null,
-  invalidView: null,
-};
-
 type PlannerFeedback =
   | string
   | {
@@ -38,11 +32,17 @@ type PlannerFeedback =
     }
   | null;
 
-export function usePlanner(initialLocation: PlannerLocation = defaultLocation) {
+export function usePlanner(
+  initialLocation: PlannerLocation = DEFAULT_PLANNER_LOCATION
+) {
   const [session] = useState(() =>
-    createPlannerSession(browserPlanRepository, initialLocation.day ?? "", {
-      draftStore: createBrowserLocalDraftStore(),
-    })
+    createPlannerSession(
+      createBrowserPlanRepository(),
+      initialLocation.day ?? "",
+      {
+        draftStore: createBrowserLocalDraftStore(),
+      }
+    )
   );
   const [locationWarning, setLocationWarning] = useState<string | null>(() =>
     plannerLocationWarning(initialLocation, initialLocation.day ?? localDate())
@@ -127,6 +127,9 @@ export function usePlanner(initialLocation: PlannerLocation = defaultLocation) {
     errorStatus: state.errorStatus,
     execute,
     load: session.load,
+    reconcileAuthenticatedUser: session.reconcileAuthenticatedUser,
+    reloadAuthenticatedUser: session.reloadAuthenticatedUser,
+    reconcileSignedOutUser: session.reconcileSignedOutUser,
     changeDate,
     async resolveDate(choice: "save" | "discard" | "cancel") {
       const resolved = await session.resolveDate(choice);

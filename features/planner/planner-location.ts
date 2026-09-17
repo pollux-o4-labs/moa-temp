@@ -11,6 +11,13 @@ export type PlannerLocation = {
   invalidView: string | null;
 };
 
+export const DEFAULT_PLANNER_LOCATION: PlannerLocation = {
+  day: null,
+  view: "blocks",
+  invalidDay: null,
+  invalidView: null,
+};
+
 export function isPlannerView(value: string | null): value is PlannerView {
   return value !== null && PLANNER_VIEWS.includes(value as PlannerView);
 }
@@ -18,12 +25,12 @@ export function isPlannerView(value: string | null): value is PlannerView {
 export function readPlannerLocation(url: URL): PlannerLocation {
   const rawDay = url.searchParams.get("day");
   const view = url.searchParams.get("view");
+  const parsedDay = rawDay === null ? undefined : dateSchema.safeParse(rawDay);
+  const validDay = rawDay === null || parsedDay?.success === true;
   return {
-    day:
-      rawDay === null || dateSchema.safeParse(rawDay).success ? rawDay : null,
+    day: validDay ? rawDay : null,
     view: isPlannerView(view) ? view : "blocks",
-    invalidDay:
-      rawDay !== null && !dateSchema.safeParse(rawDay).success ? rawDay : null,
+    invalidDay: rawDay !== null && !validDay ? rawDay : null,
     invalidView: view !== null && !isPlannerView(view) ? view : null,
   };
 }

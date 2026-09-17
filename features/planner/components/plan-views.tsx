@@ -1,26 +1,18 @@
 import { useEffect, useRef } from "react";
 import { Layers3, PieChart, LayoutList, Clock3, Undo2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  planSummary,
-  MINUTES_PER_HOUR,
-  type Plan,
-  type Block,
-} from "@/lib/plan";
+import { MINUTES_PER_HOUR, type Plan, type Block } from "@/lib/plan";
+import { planSummary } from "@/lib/plan-summary";
 import { timeLabel } from "@/lib/plan-schedule";
 import type { PlanCommand } from "@/lib/plan-commands";
 import { BlockList } from "./block-list";
-import {
-  isPlannerView,
-  withPlannerLocation,
-  type PlannerView,
-} from "../planner-location";
-import { usePlannerView } from "../use-planner-view";
+import type { PlannerView } from "../planner-location";
 import { Ring } from "./ring";
 type Props = {
   plan: Plan;
   date: string;
-  initialView: PlannerView;
+  view: PlannerView;
+  onViewChange(next: string): void;
   ready: boolean;
   saving: boolean;
   loading: boolean;
@@ -37,7 +29,8 @@ type Props = {
 export function PlanViews({
   plan,
   date,
-  initialView,
+  view,
+  onViewChange,
   ready,
   saving,
   loading,
@@ -58,16 +51,6 @@ export function PlanViews({
     restoreUndoFocus.current = false;
     requestAnimationFrame(() => startTimeRef.current?.focus());
   }, [canUndo]);
-  const view = usePlannerView(initialView);
-  function changeView(next: string) {
-    if (typeof window !== "undefined" && isPlannerView(next)) {
-      const url = withPlannerLocation(new URL(window.location.href), {
-        view: next,
-      });
-      window.history.pushState({ planner: true }, "", url);
-      window.dispatchEvent(new Event("planner-view-change"));
-    }
-  }
   const { complete } = planSummary(plan);
   const startTimeValue = plan.start === null ? "" : timeLabel(plan.start);
   function renderRows(mode: PlannerView) {
@@ -97,7 +80,7 @@ export function PlanViews({
     );
   }
   return (
-    <Tabs value={view} onValueChange={changeView}>
+    <Tabs value={view} onValueChange={onViewChange}>
       <div className="toolbar">
         <TabsList aria-label="시간표 보기 방식">
           <TabsTrigger value="blocks" disabled={loading}>

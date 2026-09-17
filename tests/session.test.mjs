@@ -4,7 +4,8 @@ import {
   createPlannerSession,
   isDirty,
 } from "../features/planner/planner-session.ts";
-import { PLAN_LIMITS, planSummary } from "../lib/plan.ts";
+import { PLAN_LIMITS } from "../lib/plan.ts";
+import { planSummary } from "../lib/plan-summary.ts";
 import { demoPlan } from "../lib/plan-fixtures.ts";
 import { schedule } from "../lib/plan-schedule.ts";
 import { mergePlans } from "../lib/plan-merge.ts";

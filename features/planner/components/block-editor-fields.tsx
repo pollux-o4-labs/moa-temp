@@ -2,8 +2,8 @@ import { X } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   COLORS,
-  CATEGORIES,
   MINUTES_PER_DAY,
+  MINUTES_PER_HOUR,
   PLAN_LIMITS,
   type Block,
 } from "@/lib/plan";
@@ -11,6 +11,7 @@ import { durationLabel } from "@/lib/plan-schedule";
 import type { RefObject } from "react";
 import { editorFieldVisibility } from "./editor-field-visibility";
 import type { PlannerView } from "../planner-location";
+import { CATEGORY_LABELS } from "../planner-category";
 
 export type EditorErrorField = "title" | "minutes" | "startMinute" | null;
 
@@ -30,14 +31,14 @@ const QUICK_DURATIONS = [15, 30, 60, 120] as const;
 function timeInputValue(minutes: number | null) {
   if (minutes === null) return "";
   const normalized = minutes % MINUTES_PER_DAY;
-  return `${String(Math.floor(normalized / 60)).padStart(2, "0")}:${String(normalized % 60).padStart(2, "0")}`;
+  return `${String(Math.floor(normalized / MINUTES_PER_HOUR)).padStart(2, "0")}:${String(normalized % MINUTES_PER_HOUR).padStart(2, "0")}`;
 }
 
 function minutesFromTime(value: string, nextDay: boolean) {
   if (!value) return null;
   const [hours, minutes] = value.split(":").map(Number);
   if (!Number.isInteger(hours) || !Number.isInteger(minutes)) return null;
-  return hours * 60 + minutes + (nextDay ? MINUTES_PER_DAY : 0);
+  return hours * MINUTES_PER_HOUR + minutes + (nextDay ? MINUTES_PER_DAY : 0);
 }
 
 export function BlockEditorFields({
@@ -226,8 +227,11 @@ export function BlockEditorFields({
           </label>
           {COLORS.map((color) => (
             <label key={color} className={`color-option ${color}`}>
-              <RadioGroupItem value={color} aria-label={CATEGORIES[color]} />
-              {CATEGORIES[color]}
+              <RadioGroupItem
+                value={color}
+                aria-label={CATEGORY_LABELS[color]}
+              />
+              {CATEGORY_LABELS[color]}
             </label>
           ))}
         </RadioGroup>

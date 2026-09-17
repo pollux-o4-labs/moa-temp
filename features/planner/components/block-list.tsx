@@ -1,7 +1,8 @@
 import { Plus, Layers3 } from "lucide-react";
 import { useRef, useState, type FormEvent } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { planSummary, type Plan, type Block } from "@/lib/plan";
+import { PLAN_LIMITS, type Plan, type Block } from "@/lib/plan";
+import { planSummary } from "@/lib/plan-summary";
 import { durationLabel, schedule, timeLabel } from "@/lib/plan-schedule";
 import { useBlockDrag } from "../use-block-drag";
 import {
@@ -71,7 +72,7 @@ export function BlockList({
             ref={quickAddRef}
             id="quick-add-title"
             value={quickTitle}
-            maxLength={100}
+            maxLength={PLAN_LIMITS.maxTitleLength}
             disabled={!enabled}
             placeholder="하고 싶은 일을 바로 적어보세요"
             aria-invalid={quickError ? "true" : undefined}

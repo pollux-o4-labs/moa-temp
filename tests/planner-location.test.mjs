@@ -5,11 +5,7 @@ import {
   readPlannerLocation,
   withPlannerLocation,
 } from "../features/planner/planner-location.ts";
-import {
-  authSignInPath,
-  chatGPTSignInPath,
-  safeRelativeReturnPath,
-} from "../lib/auth-url.ts";
+import { safeRelativeReturnPath } from "../lib/auth-url.ts";
 
 test("planner location reads only supported view values", () => {
   assert.deepEqual(
@@ -62,12 +58,4 @@ test("auth return paths preserve deep links but reject external destinations", (
   );
   assert.equal(safeRelativeReturnPath("//evil.example"), "/");
   assert.equal(safeRelativeReturnPath("https://evil.example"), "/");
-  assert.equal(
-    chatGPTSignInPath("/?day=2024-02-28&view=timeline"),
-    "/signin-with-chatgpt?return_to=%2F%3Fday%3D2024-02-28%26view%3Dtimeline"
-  );
-  assert.equal(
-    authSignInPath("/?day=2024-02-28&view=timeline"),
-    chatGPTSignInPath("/?day=2024-02-28&view=timeline")
-  );
 });

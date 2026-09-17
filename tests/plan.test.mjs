@@ -6,13 +6,13 @@ import {
   planSchema,
   sameBlock,
   samePlan,
-  CATEGORIES,
   createDraftBlock,
-  planSummary,
 } from "../lib/plan.ts";
+import { planSummary } from "../lib/plan-summary.ts";
 import { demoPlan } from "../lib/plan-fixtures.ts";
 import { schedule, timeLabel, durationLabel } from "../lib/plan-schedule.ts";
 import { dateSchema, localDate, shiftDate } from "../lib/plan-date.ts";
+import { CATEGORY_LABELS } from "../features/planner/planner-category.ts";
 import { applyPlanCommand } from "../lib/plan-commands.ts";
 
 test("new draft factory keeps optional values unset", () => {
@@ -288,7 +288,7 @@ test("all plan commands preserve the aggregate contract", () => {
 });
 
 test("labels, dates and category names cover their boundary values", () => {
-  assert.deepEqual(CATEGORIES, {
+  assert.deepEqual(CATEGORY_LABELS, {
     blue: "집중",
     peach: "일상",
     green: "휴식",

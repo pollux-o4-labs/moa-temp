@@ -3,10 +3,8 @@ import { emptyPlan, PLAN_LIMITS, samePlan, type Plan } from "../../lib/plan.ts";
 import { dateSchema } from "../../lib/plan-date.ts";
 import { demoPlan } from "../../lib/plan-fixtures.ts";
 import { applyPlanCommand, type PlanCommand } from "../../lib/plan-commands.ts";
-import {
-  type BlockField,
-  type MergeConflictDetail,
-} from "../../lib/plan-merge.ts";
+import type { BlockField } from "../../lib/block-fields.ts";
+import type { MergeConflictDetail } from "../../lib/plan-merge.ts";
 import {
   PlanRepositoryError,
   type PlanRepository,
@@ -16,8 +14,14 @@ import {
   resolvePlannerConflict,
   resolvePlannerConflictField,
 } from "./planner-session-conflicts.ts";
+import {
+  reconcileAuthenticatedUser as reconcileAuthenticatedPlan,
+  reloadAuthenticatedUser as reloadAuthenticatedPlan,
+  reconcileSignedOutUser as reconcileSignedOutPlan,
+} from "./planner-session-auth.ts";
 
-type Status = "loading" | "ready" | "saving" | "conflict" | "unavailable";
+type Status =
+  "loading" | "ready" | "reconciling" | "saving" | "conflict" | "unavailable";
 type ErrorScope = "request" | "command" | null;
 export type PlannerState = {
   plan: Plan;
@@ -32,6 +36,7 @@ export type PlannerState = {
   pendingDate: string | null;
   conflict: ConflictState | null;
   authRequired: boolean;
+  localDraftPending: boolean;
 };
 export type ConflictState = {
   draft: Plan;
@@ -42,6 +47,7 @@ export type ConflictState = {
 export function isDirty(state: PlannerState) {
   return (
     (state.status === "ready" ||
+      state.status === "reconciling" ||
       state.status === "saving" ||
       state.status === "conflict") &&
     !samePlan(state.plan, state.saved)
@@ -68,6 +74,7 @@ export function createPlannerSession(
     pendingDate: null,
     conflict: null,
     authRequired: false,
+    localDraftPending: false,
   };
   const initialState = state;
   const listeners = new Set<() => void>();
@@ -116,6 +123,7 @@ export function createPlannerSession(
       saved: blank,
       history: [],
       authRequired: false,
+      localDraftPending: false,
     });
     try {
       const result = await repository.load(parsed.data);
@@ -129,6 +137,7 @@ export function createPlannerSession(
         status: "ready",
         conflict: null,
         authRequired: false,
+        localDraftPending: false,
       });
       return true;
     } catch (error) {
@@ -146,6 +155,7 @@ export function createPlannerSession(
             errorStatus: null,
             conflict: null,
             authRequired: true,
+            localDraftPending: true,
           });
           return true;
         }
@@ -174,7 +184,7 @@ export function createPlannerSession(
         errorScope: null,
         errorStatus: null,
       });
-      if (state.authRequired) draftStore.write(state.date, next);
+      if (state.localDraftPending) draftStore.write(state.date, next);
       return true;
     } catch (error) {
       fail(error, "command");
@@ -190,13 +200,14 @@ export function createPlannerSession(
       errorScope: null,
       errorStatus: null,
     });
-    if (state.authRequired) draftStore.write(state.date, state.plan);
+    if (state.localDraftPending) draftStore.write(state.date, state.plan);
     return true;
   }
   async function save() {
     if (state.status !== "ready") return false;
     const { date: day, plan, revision } = state;
     const base = state.saved;
+    const hadLocalDraft = state.localDraftPending;
     patch({
       status: "saving",
       error: "",
@@ -211,8 +222,9 @@ export function createPlannerSession(
         status: "ready",
         conflict: null,
         authRequired: false,
+        localDraftPending: false,
       });
-      if (state.authRequired) draftStore.remove(day);
+      if (hadLocalDraft) draftStore.remove(day);
       return true;
     } catch (error) {
       fail(error);
@@ -226,6 +238,26 @@ export function createPlannerSession(
       }
       return false;
     }
+  }
+  async function reconcileAuthenticatedUser() {
+    return reconcileAuthenticatedPlan(authContext());
+  }
+  async function reloadAuthenticatedUser() {
+    return reloadAuthenticatedPlan(authContext());
+  }
+  function authContext() {
+    return {
+      getState: () => state,
+      patch,
+      nextRequestId: () => ++requestId,
+      isCurrentRequest: (id: number) => id === requestId,
+      fail,
+      repository,
+      draftStore,
+    };
+  }
+  function reconcileSignedOutUser() {
+    return reconcileSignedOutPlan(authContext());
   }
   async function requestDate(day: string) {
     if (
@@ -252,7 +284,7 @@ export function createPlannerSession(
     return load(day);
   }
   async function resolveConflict(choice: "reload" | "reapply") {
-    return resolvePlannerConflict(
+    const resolved = await resolvePlannerConflict(
       {
         getState: () => state,
         patch,
@@ -264,6 +296,11 @@ export function createPlannerSession(
       },
       choice
     );
+    if (resolved && choice === "reload" && state.localDraftPending) {
+      draftStore.remove(state.date);
+      patch({ localDraftPending: false });
+    }
+    return resolved;
   }
   async function resolveConflictField(
     blockId: string,
@@ -298,6 +335,9 @@ export function createPlannerSession(
     execute,
     undo,
     save,
+    reconcileAuthenticatedUser,
+    reloadAuthenticatedUser,
+    reconcileSignedOutUser,
     requestDate,
     resolveDate,
     resolveConflict,

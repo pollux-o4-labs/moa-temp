@@ -1,4 +1,5 @@
-import { MINUTES_PER_HOUR, planSummary, type Plan } from "@/lib/plan";
+import { MINUTES_PER_HOUR, type Plan } from "@/lib/plan";
+import { planSummary } from "@/lib/plan-summary";
 import { durationLabel, schedule } from "@/lib/plan-schedule";
 import { plannerDateContext } from "../planner-date";
 

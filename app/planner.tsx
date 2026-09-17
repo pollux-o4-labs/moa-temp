@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
 import { Plus, Layers3, CalendarDays, GripVertical } from "lucide-react";
+import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { createDraftBlock, type Block } from "@/lib/plan";
 import { usePlanner } from "@/features/planner/use-planner";
-import { authSignInPath } from "@/lib/auth-url";
+import { useAuth } from "@/features/auth/use-auth";
+import { AuthControl } from "@/features/auth/components/auth-control";
 import {
   plannerDateContext,
   type PlannerDateContext,
@@ -13,29 +15,26 @@ import type {
   PlannerLocation,
   PlannerView,
 } from "@/features/planner/planner-location";
+import { DEFAULT_PLANNER_LOCATION } from "@/features/planner/planner-location";
 import { usePlannerView } from "@/features/planner/use-planner-view";
+import { usePlannerAuthSync } from "@/features/planner/use-planner-auth-sync";
 import { PlanHeader } from "@/features/planner/components/plan-header";
 import { PlanViews } from "@/features/planner/components/plan-views";
 import { Overview } from "@/features/planner/components/overview";
 import { BlockEditor } from "@/features/planner/components/block-editor";
 import { DateChangeDialog } from "@/features/planner/components/date-change-dialog";
 import { ConflictRecoveryActions } from "@/features/planner/components/conflict-recovery-actions";
-import { activeElement, focusTarget } from "@/features/planner/planner-focus";
+import {
+  activeElement,
+  focusTarget,
+  PLANNER_FOCUS_FALLBACKS,
+} from "@/features/planner/planner-focus";
 import { usePlannerFocusRestoration } from "@/features/planner/use-planner-focus-restoration";
 
-const defaultLocation: PlannerLocation = {
-  day: null,
-  view: "blocks",
-  invalidDay: null,
-  invalidView: null,
-};
-
 export default function Planner({
-  initialLocation = defaultLocation,
-  initialReturnTo = "/",
+  initialLocation = DEFAULT_PLANNER_LOCATION,
 }: {
   initialLocation?: PlannerLocation;
-  initialReturnTo?: string;
 }) {
   const {
     state,
@@ -50,8 +49,12 @@ export default function Planner({
     resolveConflictField,
     save,
     undo,
+    reconcileAuthenticatedUser,
+    reloadAuthenticatedUser,
+    reconcileSignedOutUser,
   } = usePlanner(initialLocation);
-  const view = usePlannerView(initialLocation.view);
+  const auth = useAuth();
+  const { view, changeView } = usePlannerView(initialLocation.view);
   const {
     plan,
     date,
@@ -62,11 +65,21 @@ export default function Planner({
     history,
     pendingDate,
     conflict,
+    authRequired,
   } = state;
+  usePlannerAuthSync({
+    auth,
+    status,
+    authRequired,
+    reconcileAuthenticatedUser,
+    reloadAuthenticatedUser,
+    reconcileSignedOutUser,
+  });
   const dateContext: PlannerDateContext = plannerDateContext(date);
   const ready = status === "ready",
     saving = status === "saving",
-    loading = status === "loading";
+    reconciling = status === "reconciling",
+    loading = status === "loading" || reconciling;
   const [editor, setEditor] = useState<Block | null>(null);
   const [editorView, setEditorView] = useState<PlannerView>(view);
   const [editorInitialFocus, setEditorInitialFocus] = useState<
@@ -94,11 +107,23 @@ export default function Planner({
   }
   function requestDate(day: string) {
     captureDateTrigger(day);
+    if (dirty) toast.dismiss();
     void changeDate(day);
   }
   function savePlan() {
     captureSaveTrigger();
+    if (auth.status !== "signed_in") {
+      void auth.signIn();
+      return;
+    }
     void save();
+  }
+  function resolveDateWithAuth(choice: "save" | "discard" | "cancel") {
+    if (choice === "save" && auth.status !== "signed_in") {
+      void auth.signIn();
+      return;
+    }
+    void resolveDate(choice);
   }
   function addTitle(title: string) {
     const block: Block = createDraftBlock(crypto.randomUUID(), title);
@@ -112,11 +137,7 @@ export default function Planner({
     const resolved = await resolveConflict(choice);
     if (!resolved) return;
     requestAnimationFrame(() =>
-      focusTarget(target, [
-        '[data-planner-focus-target="date-dialog-primary"]',
-        '[data-slot="tabs-content"]:not([hidden]) [data-planner-focus-target="first-block"]',
-        '[aria-label="계획 날짜"]',
-      ])
+      focusTarget(target, PLANNER_FOCUS_FALLBACKS.conflict)
     );
   }
   async function resolveConflictFieldWithFocus(
@@ -128,10 +149,7 @@ export default function Planner({
     const resolved = await resolveConflictField(id, field, choice);
     if (!resolved) return;
     requestAnimationFrame(() =>
-      focusTarget(target, [
-        '[data-slot="tabs-content"]:not([hidden]) [data-planner-focus-target="first-block"]',
-        '[aria-label="계획 날짜"]',
-      ])
+      focusTarget(target, PLANNER_FOCUS_FALLBACKS.conflictField)
     );
   }
 
@@ -150,6 +168,11 @@ export default function Planner({
           <CalendarDays size={16} />
           나만의 작은 계획 공간
         </span>
+        <AuthControl
+          snapshot={auth}
+          onSignIn={() => void auth.signIn()}
+          onSignOut={() => void auth.signOut()}
+        />
       </header>
       <main>
         <div className="page-title">
@@ -179,6 +202,7 @@ export default function Planner({
             <PlanHeader
               date={date}
               loading={loading}
+              reconciling={reconciling}
               ready={ready}
               saving={saving}
               dirty={dirty}
@@ -188,24 +212,25 @@ export default function Planner({
               changeDate={requestDate}
               save={savePlan}
             />
-            {(error || locationWarning) && (
+            {((error && !pendingDate) || locationWarning) && (
               <div className="error-banner" role="alert">
                 {locationWarning && <span>{locationWarning}</span>}
-                {error && <span>{error}</span>}
-                {errorStatus === 401 && (
-                  <a
-                    href={authSignInPath(initialReturnTo)}
-                    onClick={(event) => {
-                      const current =
-                        window.location.pathname +
-                        window.location.search +
-                        window.location.hash;
-                      event.currentTarget.href = authSignInPath(current);
-                    }}
-                  >
-                    다시 로그인
-                  </a>
-                )}
+                {error && !pendingDate && <span>{error}</span>}
+                {error &&
+                  !pendingDate &&
+                  errorStatus === 401 &&
+                  auth.status !== "signed_in" && (
+                    <button
+                      disabled={auth.status === "unconfigured" || auth.busy}
+                      onClick={() => void auth.signIn()}
+                    >
+                      {auth.status === "unconfigured"
+                        ? "로그인 설정 필요"
+                        : auth.busy
+                          ? "로그인 중"
+                          : "Google로 로그인"}
+                    </button>
+                  )}
                 {status === "unavailable" && errorStatus !== 401 && (
                   <button onClick={() => load(date)}>다시 불러오기</button>
                 )}
@@ -224,7 +249,8 @@ export default function Planner({
             <PlanViews
               plan={plan}
               date={date}
-              initialView={initialLocation.view}
+              view={view}
+              onViewChange={changeView}
               ready={ready}
               saving={saving}
               loading={loading}
@@ -279,7 +305,7 @@ export default function Planner({
         saving={saving}
         error={error}
         conflict={conflict}
-        onResolve={resolveDate}
+        onResolve={resolveDateWithAuth}
         onResolveConflict={(choice) => void resolveConflictWithFocus(choice)}
         onResolveConflictField={(id, field, choice) =>
           void resolveConflictFieldWithFocus(id, field, choice)

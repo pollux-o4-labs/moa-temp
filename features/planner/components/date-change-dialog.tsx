@@ -5,7 +5,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { ConflictRecoveryActions } from "./conflict-recovery-actions";
-import type { BlockField } from "@/lib/plan-merge";
+import type { BlockField } from "@/lib/block-fields";
 import type { ConflictState } from "../planner-session";
 import { plannerDateContext } from "../planner-date";
 
@@ -33,7 +33,7 @@ export function DateChangeDialog({
   onResolveConflict,
   onResolveConflictField,
 }: Props) {
-  const targetName = plannerDateContext(targetDate ?? "").longName;
+  const targetName = plannerDateContext(targetDate ?? "").name;
   return (
     <Dialog
       open={open}
@@ -46,10 +46,9 @@ export function DateChangeDialog({
         showCloseButton={!saving}
         onCloseAutoFocus={(event) => event.preventDefault()}
       >
-        <DialogTitle>{targetName}로 이동할까요?</DialogTitle>
+        <DialogTitle>변경사항이 있어요</DialogTitle>
         <DialogDescription>
-          아직 저장하지 않은 변경 내용이 있어요. {targetName} 계획으로 이동하기
-          전에 선택해주세요.
+          저장하지 않은 변경사항이 있습니다. {targetName}로 이동할까요?
         </DialogDescription>
         {error && (
           <p className="form-error" role="alert">
@@ -82,14 +81,14 @@ export function DateChangeDialog({
             disabled={saving}
             onClick={() => onResolve("discard")}
           >
-            변경 버리고 {targetName}로 이동
+            저장하지 않고 이동
           </button>
           <button
             className="primary"
             disabled={saving}
             onClick={() => onResolve("save")}
           >
-            {saving ? "저장 중" : `저장하고 ${targetName}로 이동`}
+            {saving ? "저장 중" : "저장하고 이동"}
           </button>
         </div>
       </DialogContent>

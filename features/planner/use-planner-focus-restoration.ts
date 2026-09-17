@@ -1,5 +1,9 @@
 import { useEffect, useRef } from "react";
-import { activeElement, focusTarget } from "./planner-focus";
+import {
+  activeElement,
+  focusTarget,
+  PLANNER_FOCUS_FALLBACKS,
+} from "./planner-focus";
 
 type Props = {
   editorOpen: boolean;
@@ -38,10 +42,7 @@ export function usePlannerFocusRestoration({
     const target = editorReturnFocus.current;
     editorReturnFocus.current = null;
     requestAnimationFrame(() =>
-      focusTarget(target, [
-        '[data-slot="tabs-content"]:not([hidden]) [data-planner-focus-target="first-block"]',
-        '[data-slot="tabs-content"]:not([hidden]) [data-planner-focus-target="add-block"]',
-      ])
+      focusTarget(target, PLANNER_FOCUS_FALLBACKS.editor)
     );
   }, [editorOpen]);
 
@@ -51,10 +52,7 @@ export function usePlannerFocusRestoration({
     const target = dateReturnFocus.current;
     dateReturnFocus.current = null;
     requestAnimationFrame(() =>
-      focusTarget(target, [
-        '[aria-label="계획 날짜"]',
-        '[data-slot="tabs-content"]:not([hidden]) [data-planner-focus-target="first-block"]',
-      ])
+      focusTarget(target, PLANNER_FOCUS_FALLBACKS.date)
     );
   }, [date, pendingDate, loading, saving]);
 
@@ -63,11 +61,7 @@ export function usePlannerFocusRestoration({
     const target = saveReturnFocus.current;
     saveReturnFocus.current = null;
     requestAnimationFrame(() =>
-      focusTarget(target, [
-        '[data-planner-focus-target="recovery"]',
-        '[aria-label="하루 시작 시간"]',
-        '[aria-label="계획 날짜"]',
-      ])
+      focusTarget(target, PLANNER_FOCUS_FALLBACKS.save)
     );
   }, [saving]);
 

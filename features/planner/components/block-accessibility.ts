@@ -1,5 +1,6 @@
-import { CATEGORIES, type Block } from "@/lib/plan";
+import type { Block } from "@/lib/plan";
 import { durationLabel, timeLabel } from "@/lib/plan-schedule";
+import { CATEGORY_LABELS } from "../planner-category";
 
 type LabelMode = "basic" | "detailed";
 
@@ -7,7 +8,7 @@ function facts(block: Block, start: number | null, mode: LabelMode) {
   const details =
     mode === "detailed"
       ? [
-          block.color ? CATEGORIES[block.color] : null,
+          block.color ? CATEGORY_LABELS[block.color] : null,
           start === null ? null : timeLabel(start),
           block.minutes === null ? null : durationLabel(block.minutes),
         ]

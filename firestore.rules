@@ -17,6 +17,18 @@ service cloud.firestore {
           'updatedAt'
         ])
         && request.resource.data.plan is map
+        && request.resource.data.plan.keys().hasAll([
+          'schemaVersion',
+          'start',
+          'blocks'
+        ])
+        && request.resource.data.plan.keys().hasOnly([
+          'schemaVersion',
+          'start',
+          'blocks'
+        ])
+        && request.resource.data.plan.schemaVersion == 2
+        && request.resource.data.plan.blocks is list
         && request.resource.data.revision is int
         && request.resource.data.revision > 0
         && request.resource.data.updatedAt is timestamp;

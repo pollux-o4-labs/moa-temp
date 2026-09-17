@@ -20,5 +20,5 @@ description = "Start the public frontend development server"
 run = "yarn dev"
 
 [tasks.deploy]
-description = "Build and deploy the static SPA to Firebase Hosting"
-run = "yarn firebase:deploy"
+description = "Build the static SPA for GitHub Pages"
+run = "yarn pages:build"

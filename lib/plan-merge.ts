@@ -6,6 +6,7 @@ import {
   type Block,
   type Plan,
 } from "./plan.ts";
+import { BLOCK_FIELDS, type BlockField } from "./block-fields.ts";
 
 export type MergeResult =
   | { plan: Plan; conflicts: []; details: [] }
@@ -15,26 +16,17 @@ export type MergeResult =
       details: MergeConflictDetail[];
     };
 
-export type BlockField = "title" | "startMinute" | "minutes" | "color" | "done";
 export type MergeConflictDetail =
   | {
       kind: "block";
       id: string;
       local: Block;
       latest: Block;
-      fields: BlockField[];
+      fields: readonly BlockField[];
     }
   | { kind: "order" }
   | { kind: "start" }
   | { kind: "validation"; message: string };
-
-const BLOCK_FIELDS: BlockField[] = [
-  "title",
-  "startMinute",
-  "minutes",
-  "color",
-  "done",
-];
 
 function mergeBlock(
   base: Block,

@@ -11,6 +11,7 @@ import { plannerDateContext } from "../planner-date";
 type Props = {
   date: string;
   loading: boolean;
+  reconciling: boolean;
   ready: boolean;
   saving: boolean;
   dirty: boolean;
@@ -23,6 +24,7 @@ type Props = {
 export function PlanHeader({
   date,
   loading,
+  reconciling,
   ready,
   saving,
   dirty,
@@ -88,20 +90,22 @@ export function PlanHeader({
         }}
         disabled={!ready || saving || !dirty}
       >
-        {saving ? (
+        {saving || reconciling ? (
           <Loader2 className="animate-spin" size={16} />
         ) : (
           <Check size={16} />
         )}{" "}
         {saving
           ? "저장 중"
-          : unavailable
-            ? "저장 불가"
-            : dirty
-              ? "계획 저장"
-              : revision === 0
-                ? "저장할 계획 없음"
-                : "저장됨"}
+          : reconciling
+            ? "계정 계획 확인 중"
+            : unavailable
+              ? "저장 불가"
+              : dirty
+                ? "계획 저장"
+                : revision === 0
+                  ? "저장할 계획 없음"
+                  : "저장됨"}
       </button>
     </div>
   );

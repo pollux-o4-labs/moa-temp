@@ -1,0 +1,48 @@
+{
+  "entry": [
+    "app/**/*.tsx",
+    "eslint.config.mjs",
+    "features/**/*.ts",
+    "lib/**/*.ts",
+    "playwright.config.ts",
+    "postcss.config.mjs",
+    "src/main.tsx",
+    "tests/**/*.mjs",
+    "tests/**/*.ts",
+    "vite.config.ts"
+  ],
+  "ignore": ["components/ui/**", "hooks/use-mobile.ts", "stryker.config.mjs"],
+  "ignoreDependencies": [
+    "@base-ui/react",
+    "@hookform/resolvers",
+    "@shadcn/react",
+    "cmdk",
+    "date-fns",
+    "embla-carousel-react",
+    "input-otp",
+    "react-day-picker",
+    "react-hook-form",
+    "react-resizable-panels",
+    "vaul",
+    "@stryker-mutator/core",
+    "@stryker-mutator/typescript-checker",
+    "@tailwindcss/postcss",
+    "firebase-tools",
+    "eslint",
+    "prettier",
+    "tailwindcss",
+    "tw-animate-css"
+  ],
+  "ignoreBinaries": [
+    "eslint",
+    "knip",
+    "playwright",
+    "prettier",
+    "stryker",
+    "vite",
+    "tsc",
+    "firebase"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "vite": false
+}

@@ -1,13 +1,62 @@
 import { APP_ROUTES } from "./app-routes.ts";
-import { AUTH_VALIDATION_ORIGIN } from "./auth-contract.ts";
 
-export function authSignInPath(returnTo: string): string {
-  const safeReturnTo = safeRelativeReturnPath(returnTo);
-  return `${APP_ROUTES.signIn}?return_to=${encodeURIComponent(safeReturnTo)}`;
+const AUTH_VALIDATION_ORIGIN = "https://app.local";
+
+export const AUTH_RETURN_PATH_KEY = "moa:auth:return-to";
+
+type StorageLike = Pick<Storage, "getItem" | "removeItem" | "setItem">;
+
+export interface AuthReturnPathStore {
+  remember(path: string): void;
+  consume(): string | null;
+  clear(): void;
 }
 
-export function chatGPTSignInPath(returnTo: string): string {
-  return authSignInPath(returnTo);
+export const noAuthReturnPathStore: AuthReturnPathStore = {
+  remember: () => undefined,
+  consume: () => null,
+  clear: () => undefined,
+};
+
+export function createAuthReturnPathStore(
+  storage: StorageLike | null
+): AuthReturnPathStore {
+  if (!storage) return noAuthReturnPathStore;
+
+  return {
+    remember(path) {
+      try {
+        storage.setItem(AUTH_RETURN_PATH_KEY, safeRelativeReturnPath(path));
+      } catch {
+        // A blocked session store must never interrupt authentication.
+      }
+    },
+    consume() {
+      try {
+        const path = storage.getItem(AUTH_RETURN_PATH_KEY);
+        storage.removeItem(AUTH_RETURN_PATH_KEY);
+        return path ? safeRelativeReturnPath(path) : null;
+      } catch {
+        return null;
+      }
+    },
+    clear() {
+      try {
+        storage.removeItem(AUTH_RETURN_PATH_KEY);
+      } catch {
+        // Cleanup is best effort after a canceled or failed sign-in.
+      }
+    },
+  };
+}
+
+export function createBrowserAuthReturnPathStore(): AuthReturnPathStore {
+  if (typeof window === "undefined") return noAuthReturnPathStore;
+  try {
+    return createAuthReturnPathStore(window.sessionStorage);
+  } catch {
+    return noAuthReturnPathStore;
+  }
 }
 
 export function safeRelativeReturnPath(value: string): string {
@@ -20,15 +69,5 @@ export function safeRelativeReturnPath(value: string): string {
     return APP_ROUTES.home;
   }
   if (url.origin !== AUTH_VALIDATION_ORIGIN) return APP_ROUTES.home;
-  if (isReservedAuthPath(url.pathname)) return APP_ROUTES.home;
-
   return `${url.pathname}${url.search}${url.hash}`;
-}
-
-function isReservedAuthPath(pathname: string): boolean {
-  return (
-    pathname === APP_ROUTES.signIn ||
-    pathname === APP_ROUTES.signOut ||
-    pathname === APP_ROUTES.callback
-  );
 }

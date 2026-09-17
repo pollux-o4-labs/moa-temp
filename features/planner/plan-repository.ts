@@ -1,58 +1,97 @@
 import {
   loadedPlanSchema,
-  PlanRepositoryError,
-  revisionSchema,
   savedPlanSchema,
+  PlanRepositoryError,
   type PlanRepository,
 } from "@/lib/plan-contract";
+import { APP_ROUTES } from "@/lib/app-routes";
 
-const STORAGE_KEY_PREFIX = "moa:browser-plan:v1:";
+const REQUEST_TIMEOUT_MS = 5_000;
 
-function readStoredPlan(day: string) {
-  if (typeof window === "undefined") return null;
+async function request(url: string, options?: RequestInit): Promise<unknown> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const raw = window.localStorage.getItem(keyFor(day));
-    if (!raw) return null;
-    const parsed = loadedPlanSchema.safeParse(JSON.parse(raw));
-    if (!parsed.success)
-      throw new PlanRepositoryError("저장 형식을 확인해주세요.", 502);
-    return parsed.data;
-  } catch (error) {
-    if (error instanceof PlanRepositoryError) throw error;
-    throw new PlanRepositoryError("브라우저 저장소를 읽지 못했어요.", 503);
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new PlanRepositoryError(
+          "요청 시간이 초과됐어요. 다시 시도해주세요.",
+          408
+        );
+      }
+      throw new PlanRepositoryError(
+        "인터넷 연결을 확인한 뒤 다시 시도해주세요.",
+        0
+      );
+    }
+    let body: unknown;
+    try {
+      body = await response.json();
+    } catch {
+      if (controller.signal.aborted) {
+        throw new PlanRepositoryError(
+          "요청 시간이 초과됐어요. 다시 시도해주세요.",
+          408
+        );
+      }
+      throw new PlanRepositoryError(
+        response.ok
+          ? "서버 응답 형식을 확인해주세요."
+          : "요청을 처리하지 못했어요.",
+        response.status || 502
+      );
+    }
+    if (!response.ok) {
+      const message =
+        body &&
+        typeof body === "object" &&
+        "error" in body &&
+        typeof body.error === "string"
+          ? body.error
+          : "요청을 처리하지 못했어요.";
+      throw new PlanRepositoryError(message, response.status);
+    }
+    return body;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
-export const browserPlanRepository: PlanRepository = {
+function parseLoaded(body: unknown) {
+  const parsed = loadedPlanSchema.safeParse(body);
+  if (!parsed.success)
+    throw new PlanRepositoryError("서버 응답 형식을 확인해주세요.", 502);
+  return parsed.data;
+}
+
+function parseSaved(body: unknown) {
+  const parsed = savedPlanSchema.safeParse(body);
+  if (!parsed.success)
+    throw new PlanRepositoryError("서버 응답 형식을 확인해주세요.", 502);
+  return parsed.data;
+}
+
+export const httpPlanRepository: PlanRepository = {
   async load(day) {
-    return readStoredPlan(day) ?? { plan: null, revision: 0 };
+    return parseLoaded(
+      await request(`${APP_ROUTES.plansApi}?day=${encodeURIComponent(day)}`, {
+        cache: "no-store",
+      })
+    );
   },
   async save(payload) {
-    const current = readStoredPlan(payload.day) ?? { plan: null, revision: 0 };
-    if (current.revision !== payload.revision)
-      throw new PlanRepositoryError(
-        "다른 창에서 계획이 변경되었어요. 최신 내용을 확인해주세요.",
-        409
-      );
-    const revision = revisionSchema.parse(payload.revision + 1);
-    const saved = savedPlanSchema.safeParse({ revision });
-    if (!saved.success)
-      throw new PlanRepositoryError("저장 버전을 확인해주세요.", 502);
-    try {
-      window.localStorage.setItem(
-        keyFor(payload.day),
-        JSON.stringify({ plan: payload.plan, revision })
-      );
-    } catch {
-      throw new PlanRepositoryError(
-        "브라우저에 계획을 저장하지 못했어요.",
-        503
-      );
-    }
-    return saved.data;
+    return parseSaved(
+      await request(APP_ROUTES.plansApi, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+    );
   },
 };
-
-function keyFor(day: string) {
-  return `${STORAGE_KEY_PREFIX}${encodeURIComponent(day)}`;
-}

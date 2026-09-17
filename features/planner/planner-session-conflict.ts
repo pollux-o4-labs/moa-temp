@@ -1,15 +1,6 @@
-import type { Plan, Block } from "../../lib/plan.ts";
-import type { BlockField } from "../../lib/plan-merge.ts";
+import type { Plan } from "../../lib/plan.ts";
+import { replaceBlockField, type BlockField } from "../../lib/block-fields.ts";
 import type { ConflictState } from "./planner-session.ts";
-
-function replaceBlockField(target: Block, source: Block, field: BlockField) {
-  if (field === "title") return { ...target, title: source.title };
-  if (field === "startMinute")
-    return { ...target, startMinute: source.startMinute };
-  if (field === "minutes") return { ...target, minutes: source.minutes };
-  if (field === "color") return { ...target, color: source.color };
-  return { ...target, done: source.done };
-}
 
 export function applyConflictFieldChoice(
   conflict: ConflictState,

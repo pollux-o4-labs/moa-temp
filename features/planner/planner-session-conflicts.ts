@@ -1,5 +1,6 @@
 import { emptyPlan } from "../../lib/plan.ts";
-import { mergePlans, type BlockField } from "../../lib/plan-merge.ts";
+import { mergePlans } from "../../lib/plan-merge.ts";
+import type { BlockField } from "../../lib/block-fields.ts";
 import { applyConflictFieldChoice } from "./planner-session-conflict.ts";
 import type { PlannerState } from "./planner-session.ts";
 

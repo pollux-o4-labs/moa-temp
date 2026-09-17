@@ -1,8 +1,9 @@
 import { useRef, useState } from "react";
-import { CATEGORIES, type Block } from "@/lib/plan";
+import type { Block } from "@/lib/plan";
 import { timeLabel } from "@/lib/plan-schedule";
-import type { BlockField } from "@/lib/plan-merge";
+import type { BlockField } from "@/lib/block-fields";
 import type { ConflictState } from "../planner-session";
+import { CATEGORY_LABELS } from "../planner-category";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,7 +43,7 @@ function fieldValue(block: Block, field: BlockField) {
   if (field === "minutes")
     return block.minutes === null ? "지정하지 않음" : `${block.minutes}분`;
   if (field === "color")
-    return block.color === null ? "종류 없음" : CATEGORIES[block.color];
+    return block.color === null ? "종류 없음" : CATEGORY_LABELS[block.color];
   if (field === "done") return block.done ? "완료" : "미완료";
   return block.title;
 }

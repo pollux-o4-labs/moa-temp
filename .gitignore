@@ -13,6 +13,11 @@ coverage/
 .firebase/
 firebase-debug.log
 firebase-debug.*.log
+firestore-debug.log
+firestore-debug.*.log
 playwright-report/
 test-results/
 *.tsbuildinfo
+.stryker-tmp/
+.stryker-incremental.json
+reports/

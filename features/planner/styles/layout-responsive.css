@@ -32,6 +32,10 @@
   .today-label {
     font-size: 12px;
   }
+  .auth-user,
+  .auth-error {
+    display: none;
+  }
   .start-time input {
     width: 116px;
     font-size: 12px;

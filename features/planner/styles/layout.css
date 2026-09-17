@@ -43,6 +43,42 @@
   font-size: 14px;
   color: #85897e;
 }
+.auth-control {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: 0;
+  color: var(--planner-text-muted);
+  font-size: 12px;
+}
+.auth-user {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.auth-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: var(--planner-touch-target);
+  padding: 7px 10px;
+  border: 1px solid #dfe4da;
+  border-radius: 10px;
+  background: #fff;
+  color: #53664f;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.auth-button:hover {
+  background: #f3f6ef;
+}
+.auth-error {
+  max-width: 220px;
+  color: #985c45;
+  text-align: right;
+}
 main {
   max-width: 1200px;
   margin: auto;

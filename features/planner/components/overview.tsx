@@ -1,8 +1,10 @@
 import { ArrowUpRight } from "lucide-react";
-import { COLORS, CATEGORIES, planSummary, type Plan } from "@/lib/plan";
+import { COLORS, type Plan } from "@/lib/plan";
+import { planSummary } from "@/lib/plan-summary";
 import { durationLabel, timeLabel } from "@/lib/plan-schedule";
 import { Ring } from "./ring";
 import { plannerDateContext } from "../planner-date";
+import { CATEGORY_LABELS } from "../planner-category";
 export function Overview({
   plan,
   date,
@@ -47,7 +49,7 @@ export function Overview({
           return (
             <div key={color}>
               <span className={`dot ${color}`} />
-              <span>{CATEGORIES[color]}</span>
+              <span>{CATEGORY_LABELS[color]}</span>
               <b>{durationLabel(minutes)}</b>
             </div>
           );

@@ -1,5 +1,6 @@
 import { BookOpen, ShoppingBag, Coffee, PenLine, Circle } from "lucide-react";
-import { CATEGORIES, type Block } from "@/lib/plan";
+import type { Block } from "@/lib/plan";
+import { CATEGORY_LABELS } from "../planner-category";
 
 const blockIcons = {
   blue: BookOpen,
@@ -23,7 +24,7 @@ export function BlockContent({
       </span>
       <span className="block-copy">
         {showCategory && block.color && (
-          <span className="category">{CATEGORIES[block.color]}</span>
+          <span className="category">{CATEGORY_LABELS[block.color]}</span>
         )}
         <span className="block-title">{block.title}</span>
       </span>

@@ -14,15 +14,6 @@ export const PLAN_LIMITS = {
   history: 30,
 } as const;
 
-// These values remain available for the legacy demo fixture only. New user
-// input never receives these defaults; optional fields are stored as null.
-export const CATEGORIES = {
-  blue: "집중",
-  peach: "일상",
-  green: "휴식",
-  yellow: "나를 위한 시간",
-} as const;
-
 const nullableStartSchema = z
   .number()
   .int("시작 시각은 분 단위 정수로 입력해주세요.")
@@ -176,24 +167,4 @@ export function moveBlock(plan: Plan, id: string, target: number): Plan {
 
 export function emptyPlan(): Plan {
   return { schemaVersion: STORAGE_SCHEMA_VERSION, start: null, blocks: [] };
-}
-
-export function planSummary(plan: Plan) {
-  const byColor = Object.fromEntries(
-    COLORS.map((color) => [color, 0])
-  ) as Record<(typeof COLORS)[number], number>;
-  let total = 0;
-  let complete = 0;
-  for (const block of plan.blocks) {
-    if (block.minutes !== null) total += block.minutes;
-    if (block.done) complete += 1;
-    if (block.color && block.minutes !== null)
-      byColor[block.color] += block.minutes;
-  }
-  return {
-    total,
-    complete,
-    byColor,
-    end: plan.start === null ? null : plan.start + total,
-  };
 }
