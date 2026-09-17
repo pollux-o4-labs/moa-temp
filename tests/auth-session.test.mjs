@@ -115,6 +115,22 @@ test("Firebase config requires every public web setting", () => {
     }),
     true
   );
+  assert.equal(
+    shouldUseFirebaseAuthEmulator({
+      ...env,
+      MODE: "production",
+      VITE_FIREBASE_AUTH_EMULATOR: "true",
+    }),
+    true
+  );
+  assert.equal(
+    shouldUseFirebaseFirestoreEmulator({
+      ...env,
+      MODE: "production",
+      VITE_FIREBASE_FIRESTORE_EMULATOR: "true",
+    }),
+    true
+  );
 });
 
 test("auth session restores a safe deep link after a restored Firebase user", () => {

@@ -25,16 +25,11 @@ export function readFirebaseWebConfig(
 }
 
 export function shouldUseFirebaseAuthEmulator(env: FirebaseEnv): boolean {
-  return (
-    env.MODE === "development" && env.VITE_FIREBASE_AUTH_EMULATOR === "true"
-  );
+  return env.VITE_FIREBASE_AUTH_EMULATOR === "true";
 }
 
 export function shouldUseFirebaseFirestoreEmulator(env: FirebaseEnv): boolean {
-  return (
-    env.MODE === "development" &&
-    env.VITE_FIREBASE_FIRESTORE_EMULATOR === "true"
-  );
+  return env.VITE_FIREBASE_FIRESTORE_EMULATOR === "true";
 }
 
 function stringValue(value: unknown): string {
