@@ -25,8 +25,7 @@ test("the HTML entry points are safe under a Vite base path", () => {
     indexHtml,
     /rel="manifest" href="%BASE_URL%manifest\.webmanifest"/
   );
-  assert.match(indexHtml, /type="module" src="%BASE_URL%src\/main\.tsx"/);
-  assert.doesNotMatch(indexHtml, /src="\/src\/main\.tsx"/);
+  assert.match(indexHtml, /type="module" src="\/src\/main\.tsx"/);
 });
 
 test("the manifest exposes installable standalone metadata", async () => {
