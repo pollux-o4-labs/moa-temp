@@ -6,6 +6,7 @@
     "lib/**/*.ts",
     "playwright.config.ts",
     "postcss.config.mjs",
+    "public/sw.js",
     "src/main.tsx",
     "tests/**/*.mjs",
     "tests/**/*.ts",
