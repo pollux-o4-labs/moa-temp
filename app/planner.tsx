@@ -31,6 +31,8 @@ import {
 } from "@/features/planner/planner-focus";
 import { usePlannerFocusRestoration } from "@/features/planner/use-planner-focus-restoration";
 
+const allowE2eHttpSave = import.meta.env.VITE_MOA_E2E_HTTP_SAVE === "true";
+
 export default function Planner({
   initialLocation = DEFAULT_PLANNER_LOCATION,
 }: {
@@ -112,14 +114,16 @@ export default function Planner({
   }
   function savePlan() {
     captureSaveTrigger();
-    if (auth.status !== "signed_in") {
+    // HTTP repository E2E covers save/conflict UI without pretending to be a
+    // production authentication flow. The flag is only set by CI tests.
+    if (auth.status !== "signed_in" && !allowE2eHttpSave) {
       void auth.signIn();
       return;
     }
     void save();
   }
   function resolveDateWithAuth(choice: "save" | "discard" | "cancel") {
-    if (choice === "save" && auth.status !== "signed_in") {
+    if (choice === "save" && auth.status !== "signed_in" && !allowE2eHttpSave) {
       void auth.signIn();
       return;
     }
