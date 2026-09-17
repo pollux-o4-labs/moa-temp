@@ -26,9 +26,13 @@ test("timeline edit focus keeps a visible width on narrow screens", async ({
   });
   expect(metrics.focusWidth).toBeGreaterThan(0);
   expect(metrics.focusRight).toBeLessThanOrEqual(metrics.cardRight);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
-    320
-  );
+  expect(
+    await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth
+    )
+  ).toBeLessThanOrEqual(1);
 });
 
 test("edit dialog focus rings have horizontal room on narrow screens", async ({

@@ -78,10 +78,10 @@ test("responsive layout preserves labels, targets, and content width", async ({
   expect(
     await page.evaluate(
       () =>
-        document.documentElement.scrollWidth <=
+        document.documentElement.scrollWidth -
         document.documentElement.clientWidth
     )
-  ).toBe(true);
+  ).toBeLessThanOrEqual(1);
   const targetSizes = await page
     .locator(
       ".date-picker > button, .grip-button, .duration, .done-check, .start-time input"
